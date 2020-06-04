@@ -1,0 +1,25 @@
+#all {
+  text-align: center;
+}
+
+h1 {
+  font-weight: bold;
+  margin: 50px;
+}
+
+#outer_outer {
+  margin: 50px
+}
+
+#outer_cities {
+  margin: 0px auto;
+  padding: 30px;
+  border: 1px solid;
+  width: 70%;
+  font-size: 20px
+}
+
+#cities {
+  text-decoration: none;
+  color: black;
+}
