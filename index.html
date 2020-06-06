@@ -22,6 +22,7 @@
         const subject = record['subject'];
         const body = record['body'];
 
+        console.log('opening window');
         location.href = `mailto:${mailto}?cc=${cc}&subject=${subject}&body=${body}`;
       };
 
