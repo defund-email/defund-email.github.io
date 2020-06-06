@@ -11,7 +11,9 @@
       window.onhashchange = handleHashChange;
       function handleHashChange () {
         const hash = window.location.hash;
-        openEmail(window.links[hash]);
+        if (hash && window.links[hash]) {
+          openEmail(window.links[hash]);
+        }
       };
 
       function openEmail(record) {
@@ -58,6 +60,7 @@
 
           output += '</div>';
           document.getElementById('content').innerHTML = output;
+          handleHashChange();
         });
       }
     </script>
