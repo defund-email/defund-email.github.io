@@ -1,48 +1,82 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script type="text/javascript"></script>
-    <link rel="stylesheet" type="text/css" href="indexStyles.css">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="stylesheet" type="text/css" href="css/indexStyles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="img/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="img/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
+    <script src="js/airtable.js"></script>
+    <script>
+      window.onhashchange = handleHashChange;
+      function handleHashChange () {
+        const hash = window.location.hash;
+        openEmail(window.links[hash]);
+      };
+
+      function openEmail(record) {
+        const mailto = record['to'];
+        const cc = record['cc'] || '';
+        const subject = record['subject'];
+        const body = record['body'];
+
+        window.location.href = 'www.google.com';
+      };
+
+      function formatLinks () {
+        // setup airtable
+        const Airtable = require('airtable');
+        Airtable.configure({
+          endpointUrl: 'https://api.airtable.com',
+          apiKey: 'keyHmWwhb03iCaaeG'
+        });
+        var base = Airtable.base('appqEjf1SAVJbEurI');
+
+        // fetch all emails
+        base('emails').select({
+            view: 'Grid view',
+            sort: [{field: 'state', direction: 'asc'}]
+        }).firstPage(function(err, records) {
+          if (err) { console.error(err); return; }
+          let currentState;
+          const links = {};
+          let output = '<div>';
+          records.forEach(function(record) {
+            // create the state header if we're on a new state
+            if (record.fields['state'] !== currentState) {
+              currentState = record.fields['state']
+              output += `</div><div id="outer_text">
+                <h3>${record.fields['state']}</h3>`
+            }
+
+            output += `<p>&#8594;&nbsp;<a href="#${record.fields['link_id']}" id="cities">[${record.fields['city']}] ${record.fields['title']}</a></p>`
+            links[`#${record.fields['link_id']}`] = record.fields;
+
+            // save to be accessible
+            window.links = links;
+          });
+
+          output += '</div>';
+          document.getElementById('content').innerHTML = output;
+        });
+      }
+    </script>
   </head>
-  <body>
+  <body onload="formatLinks();">
     <div id="all">
       <h1 id="header">Emails to Defund the Police</h1>
-        <div id="outer_outer">
-          <div id="outer_text">
-            <p>
-              &#35;defundpolice — we want to amplify the work of organizers through email.
-            </p>
-            <p>
-              We post new emails to send everyday at 5 pm EST/2 pm PST on Instagram at <a href="https://instagram.com/defund.email" target="_blank">@defund.email</a>
-            </p>
-            <p>
-              If you'd like us to generate a link for you, please fill out the following <a href="https://forms.gle/ecAtSGXhZ11NiCcN9" target="_blank">form</a>.
-            </p>
-          </div>
-        </div>
-      <div id="outer_outer">
-        <div id="outer_cities">
-          <a href="bpd.html" id="cities">Boston</a>
-        </div>
+      <div id="outer_text">
+        <p>
+          &#35;defundpolice — we want to amplify the work of organizers through email.
+        </p>
+        <p>
+          We post new emails to send everyday at 5 pm EST/2 pm PST on Instagram at <a href="https://instagram.com/defund.email" target="_blank">@defund.email</a>
+        </p>
+        <p>
+          If you'd like us to generate a link for you, please fill out the following <a href="https://forms.gle/ecAtSGXhZ11NiCcN9" target="_blank">form</a>.
+        </p>
       </div>
-      <div id="outer_outer">
-        <div id="outer_cities">
-          <a href="lapd.html" id="cities">Los Angeles</a>
-        </div>
-      </div>
-      <div id="outer_outer">
-        <div id="outer_cities">
-          <a href="nhpd.html" id="cities">New Haven</a>
-        </div>
-      </div>
-      <div id="outer_outer">
-        <div id="outer_cities">
-          <a href="ppd.html" id="cities">Philadelphia</a>
-        </div>
+      <div id="content">
       </div>
     </div>
   </body>
