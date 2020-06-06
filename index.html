@@ -20,7 +20,7 @@
         const subject = record['subject'];
         const body = record['body'];
 
-        window.location.href = 'www.google.com';
+        location.href = `mailto:${mailto}?cc=${cc}&subject=${subject}&body=${body}`;
       };
 
       function formatLinks () {
