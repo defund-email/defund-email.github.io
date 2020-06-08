@@ -23,7 +23,6 @@
       const subject = record['subject'];
       const body = record['body'];
 
-      console.log('opening window');
       location.href = `mailto:${mailto}?cc=${cc}&subject=${subject}&body=${body}`;
     };
 
@@ -99,13 +98,13 @@
 
       let output = '<div>';
       let currentState;
+      const links = {};
 
       // fetch all emails
       base('emails').select({
         view: 'Grid view',
         sort: [{ field: 'state', direction: 'asc' }]
       }).eachPage(function (records, fetchNextPage) {
-        const links = {};
         records.forEach(function (record) {
           // create the state header if we're on a new state
           if (record.fields['state'] !== currentState) {
@@ -117,17 +116,15 @@
 
           output += `<p>&#8594;&nbsp;<a href="#${record.fields['link_id']}" id="cities">[${record.fields['city']}] ${record.fields['title']}</a></p>`
           links[`#${record.fields['link_id']}`] = record.fields;
-
-          // save to be accessible
-          window.links = links;
         });
-        // in case this is the initial load and it has a #hash
-        handleHashChange();
 
         fetchNextPage();
       }, function done (err) {
         if (err) { console.error(err); return; }
-        console.log('done called')
+        // save to be accessible
+        window.links = links;
+        // in case this is the initial load and it has a #hash
+        handleHashChange();
         output += '</div>';
         document.getElementById('content').innerHTML = output;
       });
