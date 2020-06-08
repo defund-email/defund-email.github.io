@@ -30,6 +30,7 @@
     function formatLinks() {
       // setup airtable
       const Airtable = require('airtable');
+      // sorry hackers this is read only
       Airtable.configure({
         endpointUrl: 'https://api.airtable.com',
         apiKey: 'keyHmWwhb03iCaaeG'
@@ -96,20 +97,21 @@
         return abbrMapping[state]
       }
 
+      let output = '<div>';
+      let currentState;
+
       // fetch all emails
       base('emails').select({
         view: 'Grid view',
         sort: [{ field: 'state', direction: 'asc' }]
-      }).firstPage(function (err, records) {
-        if (err) { console.error(err); return; }
-        let currentState;
+      }).eachPage(function (records, fetchNextPage) {
         const links = {};
-        let output = '<div>';
         records.forEach(function (record) {
           // create the state header if we're on a new state
           if (record.fields['state'] !== currentState) {
             currentState = record.fields['state']
-            output += `</div><div id="outer_text">
+            output += `</div>
+              <div id="outer_text">
                 <h3>${sortByFullStateName(record.fields['state'])}</h3>`
           }
 
@@ -119,10 +121,15 @@
           // save to be accessible
           window.links = links;
         });
+        // in case this is the initial load and it has a #hash
+        handleHashChange();
 
+        fetchNextPage();
+      }, function done (err) {
+        if (err) { console.error(err); return; }
+        console.log('done called')
         output += '</div>';
         document.getElementById('content').innerHTML = output;
-        handleHashChange();
       });
     }
   </script>
