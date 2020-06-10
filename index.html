@@ -13,17 +13,25 @@
     function handleHashChange() {
       const hash = window.location.hash;
       if (hash && window.links[hash]) {
-        openEmail(window.links[hash]);
+        openCommunication(window.links[hash]);
       }
     };
 
-    function openEmail(record) {
-      const mailto = record['to'];
+    function openCommunication(record) {
+      const to = record['to'];
       const cc = record['cc'] || '';
       const subject = record['subject'];
       const body = record['body'];
 
-      location.href = `mailto:${mailto}?cc=${cc}&subject=${subject}&body=${body}`;
+      let href;
+      // texts don't have a subject
+      if (!subject) {
+        href = `sms:${to}&body=${body}`;
+      } else {
+        href = `mailto:${to}?cc=${cc}&subject=${subject}&body=${body}`;
+      }
+
+      location.href = href;
     };
 
     function formatLinks() {
@@ -114,7 +122,12 @@
                 <h3>${sortByFullStateName(record.fields['state'])}</h3>`
           }
 
-          output += `<p>&#8594;&nbsp;<a href="#${record.fields['link_id']}" id="cities">[${record.fields['city']}] ${record.fields['title']}</a></p>`
+          output += `<p>
+            ${record.fields['strikethrough'] ? '&#10003;' : '&#8594;'}&nbsp;
+            <a href="#${record.fields['link_id']}" id="${record.fields['strikethrough'] ? 'strikethrough' : 'cities'}">
+              [${record.fields['city']}] ${record.fields['title']}
+            </a>
+          </p>`
           links[`#${record.fields['link_id']}`] = record.fields;
         });
 
