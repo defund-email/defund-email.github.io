@@ -113,6 +113,7 @@
         view: 'Grid view',
         sort: [{ field: 'state', direction: 'asc' }]
       }).eachPage(function (records, fetchNextPage) {
+        records = records.sort((a, b) => { if (a.fields.state === b.fields.state) { return (a.fields.city > b.fields.city) ? 1 : (a.fields.city === b.fields.city) ? ((a.fields.title > b.fields.title) ? 1 : -1) : -1 } })
         records.forEach(function (record) {
           // create the state header if we're on a new state
           if (record.fields['state'] !== currentState) {
